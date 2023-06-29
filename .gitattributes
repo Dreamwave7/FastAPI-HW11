@@ -1,2 +1,15 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# ├── src
+# |  ├─database
+# │  |   ├── db.py
+# │  |   └── models.py
+# │  ├── repository
+# │  |   ├── notes.py
+# │  |   └── tags.py
+# │  ├── routes
+# │  |   ├── notes.py
+# │  |   └── tags.py
+# │  └── schemas.py
+# ├── pyproject.toml
+# └── main.py
