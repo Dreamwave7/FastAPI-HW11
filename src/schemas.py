@@ -43,5 +43,25 @@ class ContactModel(BaseModel):
     class Config:
         orm_mode = True
 
+class ContactUpdate(BaseModel):
+    name:str
+    email:str
+    phone:str
+    birthday:str
 
-    
+
+
+class ContactName(BaseModel):
+    name:str
+
+
+
+class ContactBirthday(BaseModel):
+    birthday:str
+
+
+
+class ContactLastname(BaseModel):
+    lastname:str
+
+ 

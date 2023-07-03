@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from src.database.models import *
 from src.schemas import *
+from datetime import datetime, timedelta
 
 
 async def get_contacts(db:Session):
@@ -21,40 +22,54 @@ async def create_new_contact(body:ContactModel, db: Session):
     db.refresh(user)
     return user
 
-# async def get_notes(skip:int, limit:int, db:Session):
-#     return db.query(Note).offset(skip).limit(limit).all()
+async def change_contact(body:ContactUpdate, db:Session):
+    res = db.query(Contacts).filter(Contacts.name == body.name).first()
+    res.birthday = body.birthday
+    res.email = body.email
+    res.phone = body.phone
+    db.commit()
+    db.refresh(res)
+    return  res
 
-# async def get_note(note_id:int, db:Session):
-#     return db.query(Note).filter(Note.id == note_id).first()
+async def delete(name:ContactName, db:Session):
+    res = db.query(Contacts).filter(Contacts.name == name.name).first()
+    db.delete(res)
+    db.commit()
+    return res
 
-# async def create_note(body:NoteModel, db:Session):
-#     tags = db.query(Tag).filter(Tag.id.in_(body.tags)).all()
-#     note = Note(title = body.title, description = body.description, tags = tags)
-#     db.add(note)
-#     db.commit()
-#     db.refresh(note)
-#     return note
+async def find_name(username:ContactName, db:Session):
+    res = db.query(Contacts).filter(Contacts.name == username.name).first()
+    return res
 
-# async def remove_note(note_id:int, db:Session):
-#     note = db.query(Note).filter(Note.id == note_id).first()
-#     if note:
-#         db.delete(note)
-#         db.commit()
-#     return note
+async def find_birthday(birthday:ContactBirthday, db :Session):
+    res = db.query(Contacts).filter(Contacts.birthday == birthday.birthday).all()
+    return res
 
-# async def update_note(note_id:int,body:NoteUpdate, db:Session):
-#     note = db.query(Note).filter(Note.id == note_id).first()
-#     note.title = body.title
-#     note.description = body.description
-#     note.done = body.done
-#     note.tags = body.tags
-#     db.commit()
+async def find_lastname(lastname:ContactLastname, db:Session):
+    res = db.query(Contacts).filter(Contacts.lastname == lastname.lastname).all()
+    return res
 
-#     return note
+async def birthdays_7(db:Session):
+    users = db.query(Contacts).all()
+    birthdays_list = []
 
-# async def update_status(note_id:int, body:NoteStatusUpdate, db:Session):
-#     note = db.query(Note).filter(Note.id == note_id).first()
-#     if note:
-#         note.done = body.done
-#         db.commit()
-#         return note
+    for user in users:
+        birth = verify_date(user.birthday)
+        if birth:
+            birthdays_list.append(user)
+        else:
+            continue
+    return birthdays_list
+
+
+
+def verify_date(date:str):
+    current = datetime.now().date()
+    year = current.year
+    current_7 = current + timedelta(days=7)
+    user_date = datetime.strptime(date, "%d.%m.%Y").date().replace(year=year)
+
+    if current < user_date < current_7:
+        return True
+    else:
+        return False
