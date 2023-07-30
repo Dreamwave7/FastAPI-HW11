@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
+
 class Contacts(Base):
     __tablename__ = "contacts"
     id = Column(Integer,primary_key=True)
@@ -16,3 +17,45 @@ class Contacts(Base):
     email = Column(String(300),nullable=False)
     phone = Column(String(30), nullable=False)
     birthday = Column(String(25), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), default=None)
+    user = relationship("User", backref="contacts")
+
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    email = Column(String(100), unique=True, nullable=False)
+    password = Column(String(300), nullable= False, unique=True)
+    refresh_token = Column(String(300), nullable=False)
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
