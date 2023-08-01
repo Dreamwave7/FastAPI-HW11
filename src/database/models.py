@@ -24,9 +24,10 @@ class Contacts(Base):
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
+    username = Column(String(100),nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(300), nullable= False, unique=True)
-    refresh_token = Column(String(300), nullable=False)
+    refresh_token = Column(String(300), nullable=True)
 
     
 

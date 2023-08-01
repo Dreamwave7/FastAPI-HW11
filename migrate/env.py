@@ -2,8 +2,8 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from src.database.db import sql_key
 from src.database.models import Base
+from src.database.db import sql_key
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -21,7 +21,6 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 config.set_main_option("sqlalchemy.url", sql_key)
-
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
@@ -40,7 +39,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = sql_key
     context.configure(
         url=url,
         target_metadata=target_metadata,

@@ -13,7 +13,7 @@ class Auth:
     context = CryptContext(schemes=["bcrypt"],deprecated = "auto")
     SECRET = "Consequences"
     AlGM = "HS256"
-    oauth2 = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+    oauth2 = OAuth2PasswordBearer(tokenUrl="/login")
 
     def verify_password(self, ordinary_password, hashed_password):
         return self.context.verify(ordinary_password, hashed_password)
