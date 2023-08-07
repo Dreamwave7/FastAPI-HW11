@@ -16,3 +16,9 @@ async def refresh_token(user: User, token:str|None, db: Session):
     user.refresh_token = token
     db.commit()
     return "Done"
+
+async def update_token(user:User, db:Session, token:str):
+    user.refresh_token = token
+    db.commit()
+    db.refresh(user)
+    return "done"

@@ -1,6 +1,6 @@
 from typing import List
 from fastapi.security import OAuth2PasswordBearer, HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordRequestForm
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Security
 from src.database.db import get_db
 from src.schemas import *
 from src.actions import contacts as act
@@ -23,9 +23,33 @@ async def signup(body: UserModel, db:Session = Depends(get_db)):
 @router.post("/login",response_model=TokenModel)
 async def login(body: OAuth2PasswordRequestForm = Depends(), db:Session = Depends(get_db)):
     user = await user_act.get_user(body.username, db)
-    
-    return "d"
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid email")
+    if not auth_user.verify_password(body.password, user.password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=" invalid email")
 
+    access_token = await auth_user.create_accesstoken(data={"sub":user.email})
+    refresh_token = await auth_user.create_refreshtoken(data={"sub":user.email})
+    await user_act.update_token(user,db, refresh_token)
+    return {"access_token":access_token, "refresh_token":refresh_token,"token_type":"bearer"}
+
+@router.post("/refresh_token",response_model=TokenModel)
+async def refresh_token(info:HTTPAuthorizationCredentials = Security(security), db:Session = Depends(get_db)):
+    token = info.credentials
+    email = await auth_user.decode_refresh(token)
+    user = await user_act.get_user(email,db)
+    if user.refresh_token != token:
+        await user_act.update_token(user,db,None)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=" invalid email")
+    access = await auth_user.create_accesstoken(data={"sub":email})
+    refresh = await auth_user.create_refreshtoken(data={"sub":email})
+    await user_act.update_token(user,db,token)
+
+    return {"access_token":access, "refresh_token":refresh,"token_type":"bearer"}
+
+@router.post("/test_access")
+async def test_access(user:User = Depends(auth_user.get_user)):
+    return {"user":user.email}
 
 # @router.post("/create")
 # async def create_contact(body: ContactModel, db:Session = Depends(get_db)):
