@@ -55,8 +55,6 @@ class ContactResponse(BaseModel):
 
 
 class ContactUpdate(BaseModel):
-    name:str
-    lastname:str
     email:str
     phone:str
     birthday:str

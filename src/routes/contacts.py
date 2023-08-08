@@ -85,28 +85,24 @@ async def delete(contact_id, user:User =Depends(auth_user.get_user),db:Session =
     return res
 
 
-# @router.post("/find/name")
-# async def search_name(username:ContactName, db:Session = Depends(get_db)):
-#     res = await con.find_name(username, db)
-#     return res
+@router.post("/find_name",response_model=ContactResponse)
+async def search_name(username:ContactName, user:User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
+    result = await act.find_name(username, user,db)
+    return result
+
+@router.post("/find_birthday", response_model=ContactResponse)
+async def search_birthday(birthday:ContactBirthday,user:User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
+    res = await act.find_birthday(birthday,user,db)
+    return res
+
+@router.patch("/change_contact/{contact_id}", response_model=ContactResponse)
+async def change(contact_id:int,body:ContactUpdate,user:User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
+    res = await act.change_contact(contact_id,body,user,db)
+    return res
 
 
-# @router.patch("/change")
-# async def change(body:ContactUpdate, db:Session = Depends(get_db)):
-#     res = await con.change_contact(body, db)
-#     return res
-
-
-
-
-
-# @router.post("/find/birthday", response_model= List[ContactModel])
-# async def search_birthday(birthday:ContactBirthday, db:Session = Depends(get_db)):
-#     res = await con.find_birthday(birthday, db)
-#     return res
-
-# @router.post("/find/lastname", response_model= List[ContactModel])
-# async def search_lastname(lastname:ContactLastname, db: Session = Depends(get_db)):
-#     res = await con.find_lastname(lastname, db)
-#     return res
+@router.post("/find_lastname", response_model=ContactModel)
+async def search_lastname(lastname:ContactLastname,user:User=Depends(auth_user.get_user) , db: Session = Depends(get_db)):
+    res = await act.find_lastname(lastname,user,db)
+    return res
 
