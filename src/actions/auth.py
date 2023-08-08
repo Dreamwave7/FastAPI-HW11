@@ -26,7 +26,7 @@ class Auth:
         if expires_time:
             expire = datetime.utcnow() + timedelta(seconds=expires_time)
         else:
-            expire = datetime.utcnow() + timedelta(minutes=20)
+            expire = datetime.utcnow() + timedelta(minutes=200)
         to_encode.update({"iat":datetime.utcnow(), "exp":expire, "scope":"access_token"})
         encoded_token = jwt.encode(to_encode, self.SECRET, algorithm=self.AlGM)
         return encoded_token

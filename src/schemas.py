@@ -19,6 +19,8 @@ class UserModel(BaseModel):
     username:str
     password: str
 
+class Create_ResponseModel(BaseModel):
+    user: UserDB
 
 class UserResponse(BaseModel):
     user:UserDB
@@ -35,10 +37,22 @@ class ContactModel(BaseModel):
     email:str
     phone: str
     birthday: str
-    user_id :int
 
     class Config:
         orm_mode = True
+
+class ContactResponse(BaseModel):
+    name:str
+    lastname:str
+    phone:str
+    user_id:int
+    email:str
+    id :int
+    birthday:str
+
+    class Config:
+        orm_mode = True
+
 
 class ContactUpdate(BaseModel):
     name:str
@@ -61,5 +75,3 @@ class ContactBirthday(BaseModel):
 
 class ContactLastname(BaseModel):
     lastname:str
-
- 

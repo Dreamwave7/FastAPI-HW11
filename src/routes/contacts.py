@@ -45,32 +45,49 @@ async def refresh_token(info:HTTPAuthorizationCredentials = Security(security), 
     refresh = await auth_user.create_refreshtoken(data={"sub":email})
     await user_act.update_token(user,db,token)
 
-    return {"access_token":access, "refresh_token":refresh,"token_type":"bearer"}
+    return {"access_token":access, "refresh_token":refresh, "token_type":"bearer"}
 
 @router.post("/test_access")
 async def test_access(user:User = Depends(auth_user.get_user)):
     return {"user":user.email}
 
-# @router.post("/create")
-# async def create_contact(body: ContactModel, db:Session = Depends(get_db)):
-#     res = await con.create_new_contact(body, db)
-#     return res
-
-# @router.get("/", response_model=List[ContactModel])
-# async def contacts(db :Session = Depends(get_db)):
-#     res = await con.get_contacts(db)
-#     return res
 
 
-# @router.get("/birthdays", response_model=List[ContactModel])
-# async def get_birthdays(db:Session = Depends(get_db)):
-#     res = await con.birthdays_7(db)
-#     return res
+#Action with contacts
+
+@router.post("/create")
+async def create_contact(body: ContactModel,user: User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
+    new_contact = await act.create_new_contact(body, user, db)
+    return {"new_contact_created":new_contact}
+
+@router.post("/get_contacts",response_model=List[ContactResponse])
+async def contacts(user:User = Depends(auth_user.get_user),db :Session = Depends(get_db)):
+    res = await act.get_contacts(user,db)
+    return res
 
 
-# @router.get("/{contact_id}")
-# async def read_note(contact_id:int, db:Session = Depends(get_db)):
-#     res = await con.get_contact(contact_id, db)
+@router.post("/get_contact/{contact_id}",response_model=ContactResponse)
+async def read_note(contact_id:int,user:User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
+    res = await act.get_contact(contact_id, user, db)
+    return res
+
+
+
+@router.post("/birthdays", response_model=List[ContactResponse])
+async def get_birthdays(user:User= Depends(auth_user.get_user),db:Session = Depends(get_db)):
+    res = await act.birthdays_7(user,db)
+    return res
+
+
+@router.delete("/delete/{contact_id}",response_model=ContactResponse)
+async def delete(contact_id, user:User =Depends(auth_user.get_user),db:Session = Depends(get_db)):
+    res = await act.delete_contact(contact_id,user,db)
+    return res
+
+
+# @router.post("/find/name")
+# async def search_name(username:ContactName, db:Session = Depends(get_db)):
+#     res = await con.find_name(username, db)
 #     return res
 
 
@@ -79,15 +96,8 @@ async def test_access(user:User = Depends(auth_user.get_user)):
 #     res = await con.change_contact(body, db)
 #     return res
 
-# @router.delete("/delete")
-# async def delete(name:ContactName, db:Session = Depends(get_db)):
-#     res = await con.delete(name, db)
-#     return res
 
-# @router.post("/find/name")
-# async def search_name(username:ContactName, db:Session = Depends(get_db)):
-#     res = await con.find_name(username, db)
-#     return res
+
 
 
 # @router.post("/find/birthday", response_model= List[ContactModel])
@@ -100,7 +110,3 @@ async def test_access(user:User = Depends(auth_user.get_user)):
 #     res = await con.find_lastname(lastname, db)
 #     return res
 
-# @router.get("/birthdays")
-# async def get_birthdays(db:Session = Depends(get_db)):
-#     res = await con.birthdays_7(db)
-#     return res
