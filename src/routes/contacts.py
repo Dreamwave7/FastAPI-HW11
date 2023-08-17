@@ -7,18 +7,21 @@ from src.actions import contacts as act
 from src.actions import users as user_act
 from src.actions.auth import auth_user
 from sqlalchemy.orm import Session
+from fastapi import BackgroundTasks, Request
+from src.actions.email import send_email
 
 router = APIRouter(prefix="/contacts")
 security = HTTPBearer()
 
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def signup(body: UserModel, db:Session = Depends(get_db)):
+async def signup(body: UserModel,back_tasks: BackgroundTasks,request:Request, db:Session = Depends(get_db)):
     exist_user = await user_act.get_user(body.email, db)
     if exist_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="account already exist")
     body.password = auth_user.get_hash(body.password)
     new_user = await user_act.create_user(body, db)
-    return {"user":new_user, "detail": "user created!"}
+    back_tasks.add_task(send_email, new_user.email, new_user.username,request.base_url)
+    return {"user":new_user, "detail": "user created! \n Check Your email for verification!"}
 
 @router.post("/login",response_model=TokenModel)
 async def login(body: OAuth2PasswordRequestForm = Depends(), db:Session = Depends(get_db)):

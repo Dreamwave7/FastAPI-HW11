@@ -3,6 +3,7 @@ from src.database.models import *
 from src.schemas import *
 
 
+
 async def get_user(email:str, db:Session):
     return db.query(User).filter(User.email == email).first()
  
@@ -23,3 +24,9 @@ async def update_token(user:User, db:Session, token:str):
     db.commit()
     db.refresh(user)
     return "done"
+
+async def confirm_email(email:str, db:Session) ->None:
+    user = await get_user(email,db)
+    user.confirmed = True
+    db.commit()
+    
