@@ -49,27 +49,28 @@ async def delete_contact(contact_id, user:User, db:Session):
     return res
 
 
-async def find_name(username:ContactName,user:User, db:Session):
-    result = db.query(Contacts).filter(and_(Contacts.user_id == user.id, Contacts.name == username.name)).first()
-    return result
-
-async def find_birthday(birthday:ContactBirthday,user:User, db :Session):
-    res = db.query(Contacts).filter(and_(Contacts.user_id == user.id, Contacts.birthday == birthday.birthday)).first()
-    return res
-
-async def change_contact(contact_id:int, body:ContactUpdate,user:User, db:Session):
-    user = db.query(Contacts).filter(and_(Contacts.user_id == user.id, Contacts.id == contact_id)).first()
-    user.birthday = body.birthday
-    user.email = body.email
-    user.phone = body.phone
-    db.commit()
-    db.refresh(user)
-    return  user
+# async def change_contact(body:ContactUpdate, db:Session):
+#     res = db.query(Contacts).filter(Contacts.name == body.name).first()
+#     res.birthday = body.birthday
+#     res.email = body.email
+#     res.phone = body.phone
+#     db.commit()
+#     db.refresh(res)
+#     return  res
 
 
-async def find_lastname(lastname:ContactLastname,user:User, db:Session):
-    res = db.query(Contacts).filter(and_(Contacts.user_id == user.id, Contacts.lastname == lastname.lastname)).first()
-    return res
+# async def find_name(username:ContactName, db:Session):
+#     res = db.query(Contacts).filter(Contacts.name == username.name).first()
+#     return res
+
+# async def find_birthday(birthday:ContactBirthday, db :Session):
+#     res = db.query(Contacts).filter(Contacts.birthday == birthday.birthday).all()
+#     return res
+
+# async def find_lastname(lastname:ContactLastname, db:Session):
+#     res = db.query(Contacts).filter(Contacts.lastname == lastname.lastname).all()
+#     return res
+
 
 
 
