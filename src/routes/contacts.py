@@ -30,6 +30,9 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db:Session = Depend
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid email")
     if not auth_user.verify_password(body.password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=" invalid email")
+    if not user.confirmed:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=" invalid email")
+
 
     access_token = await auth_user.create_accesstoken(data={"sub":user.email})
     refresh_token = await auth_user.create_refreshtoken(data={"sub":user.email})
@@ -49,6 +52,20 @@ async def refresh_token(info:HTTPAuthorizationCredentials = Security(security), 
     await user_act.update_token(user,db,token)
 
     return {"access_token":access, "refresh_token":refresh, "token_type":"bearer"}
+
+
+@router.get("/confirmed_email/{token}")
+async def confirm_email(token:str, db:Session = Depends(get_db)):
+    email = await auth_user.get_email_fromToken(token)
+    user = await user_act.get_user(email,db)
+
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="verification error")
+    if user.confirmed:
+        return {"message":"your email is already confirmed"}
+    
+    await user_act.confirm_email(email,db)
+    return {"message": "email confirmed"}
 
 @router.post("/test_access")
 async def test_access(user:User = Depends(auth_user.get_user)):

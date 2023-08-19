@@ -72,4 +72,12 @@ class Auth:
         token = jwt.encode(to_encode, self.SECRET, algorithm=self.AlGM)
         return token
     
+    async def get_email_fromToken(self,token:str):
+        try:
+            payload = jwt.decode(token, self.SECRET, algorithms=self.AlGM)
+            email = payload["sub"]
+            return email
+        except JWTError as e:
+            print(e)
+    
 auth_user = Auth()

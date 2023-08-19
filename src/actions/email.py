@@ -12,9 +12,9 @@ config = ConnectionConfig(MAIL_USERNAME="dima63475@meta.ua",
                           MAIL_SERVER="smtp.meta.ua",
                           MAIL_STARTTLS=False,
                           MAIL_SSL_TLS=True,
-                          MAIL_FROM=EmailStr("dima63475@meta.ua"),
+                          MAIL_FROM="dima63475@meta.ua",
                           MAIL_FROM_NAME="KingKong",
-                          TEMPLATE_FOLDER=Path(__file__).parent/"templates",
+                          TEMPLATE_FOLDER=Path(__file__).parent / "templates",
                           USE_CREDENTIALS=True)
 
 async def send_email(email:EmailStr, username:str, host:str):
