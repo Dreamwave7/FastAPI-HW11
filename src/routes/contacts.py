@@ -29,9 +29,9 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db:Session = Depend
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid email")
     if not auth_user.verify_password(body.password, user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=" invalid email")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=" invalid password")
     if not user.confirmed:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=" invalid email")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="  user not confirmed")
 
 
     access_token = await auth_user.create_accesstoken(data={"sub":user.email})
@@ -103,6 +103,13 @@ async def get_birthdays(user:User= Depends(auth_user.get_user),db:Session = Depe
 async def delete(contact_id, user:User =Depends(auth_user.get_user),db:Session = Depends(get_db)):
     res = await act.delete_contact(contact_id,user,db)
     return res
+
+@router.post("/request_email")
+async def request_email(body:RequestEmail, back_task:BackgroundTasks, request:Request, db:Session = Depends(get_db)):
+    user = await user_act.get_user(body.email, db)
+
+    if user.confirmed:
+        return {"message": "Check your email for confirmation."}
 
 
 # @router.post("/find/name")

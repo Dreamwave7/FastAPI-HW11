@@ -1,11 +1,13 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from src.database.models import *
 
+class RequestEmail(BaseModel):
+    email:EmailStr
 
 class UserDB(BaseModel):
-    id:str
+    id:int
     username:str
     email:str
     password:str
