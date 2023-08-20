@@ -49,14 +49,14 @@ async def delete_contact(contact_id, user:User, db:Session):
     return res
 
 
-# async def change_contact(body:ContactUpdate, db:Session):
-#     res = db.query(Contacts).filter(Contacts.name == body.name).first()
-#     res.birthday = body.birthday
-#     res.email = body.email
-#     res.phone = body.phone
-#     db.commit()
-#     db.refresh(res)
-#     return  res
+async def change_contact(body:ContactUpdate, db:Session):
+    res = db.query(Contacts).filter(Contacts.name == body.name).first()
+    res.birthday = body.birthday
+    res.email = body.email
+    res.phone = body.phone
+    db.commit()
+    db.refresh(res)
+    return  res
 
 
 # async def find_name(username:ContactName, db:Session):

@@ -104,6 +104,14 @@ async def delete(contact_id, user:User =Depends(auth_user.get_user),db:Session =
     res = await act.delete_contact(contact_id,user,db)
     return res
 
+
+
+@router.patch("/change")
+async def change(body:ContactUpdate,contact_id:int, user :User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
+    res = await act.change_contact(body,contact_id, db)
+    return res
+
+
 @router.post("/request_email")
 async def request_email(body:RequestEmail, back_task:BackgroundTasks, request:Request, db:Session = Depends(get_db)):
     user = await user_act.get_user(body.email, db)
@@ -112,20 +120,11 @@ async def request_email(body:RequestEmail, back_task:BackgroundTasks, request:Re
         return {"message": "Check your email for confirmation."}
 
 
+
 # @router.post("/find/name")
 # async def search_name(username:ContactName, db:Session = Depends(get_db)):
 #     res = await con.find_name(username, db)
 #     return res
-
-
-# @router.patch("/change")
-# async def change(body:ContactUpdate, db:Session = Depends(get_db)):
-#     res = await con.change_contact(body, db)
-#     return res
-
-
-
-
 
 # @router.post("/find/birthday", response_model= List[ContactModel])
 # async def search_birthday(birthday:ContactBirthday, db:Session = Depends(get_db)):
