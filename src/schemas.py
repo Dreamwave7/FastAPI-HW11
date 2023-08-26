@@ -77,3 +77,6 @@ class ContactBirthday(BaseModel):
 
 class ContactLastname(BaseModel):
     lastname:str
+
+class ContactID(BaseModel):
+    id :int

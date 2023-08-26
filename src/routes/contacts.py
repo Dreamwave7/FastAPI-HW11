@@ -80,7 +80,7 @@ async def create_contact(body: ContactModel,user: User = Depends(auth_user.get_u
     new_contact = await act.create_new_contact(body, user, db)
     return {"new_contact_created":new_contact}
 
-@router.post("/get_contacts",response_model=List[ContactResponse])
+@router.get("/get_contacts",response_model=List[ContactResponse])
 async def contacts(user:User = Depends(auth_user.get_user),db :Session = Depends(get_db)):
     res = await act.get_contacts(user,db)
     return res
@@ -107,8 +107,8 @@ async def delete(contact_id, user:User =Depends(auth_user.get_user),db:Session =
 
 
 @router.patch("/change")
-async def change(body:ContactUpdate,contact_id:int, user :User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
-    res = await act.change_contact(body,contact_id, db)
+async def change(body:ContactUpdate,contact_id:ContactID, user :User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
+    res = await act.change_contact(body,contact_id,user, db)
     return res
 
 
@@ -121,18 +121,17 @@ async def request_email(body:RequestEmail, back_task:BackgroundTasks, request:Re
 
 
 
-# @router.post("/find/name")
-# async def search_name(username:ContactName, db:Session = Depends(get_db)):
-#     res = await con.find_name(username, db)
-#     return res
+@router.post("/find_name",response_model=ContactResponse)
+async def search_name(username:ContactName, user:User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
+    result = await act.find_name(username, user,db)
+    return result
 
-# @router.post("/find/birthday", response_model= List[ContactModel])
-# async def search_birthday(birthday:ContactBirthday, db:Session = Depends(get_db)):
-#     res = await con.find_birthday(birthday, db)
-#     return res
+@router.post("/find_birthday", response_model=ContactResponse)
+async def search_birthday(birthday:ContactBirthday,user:User = Depends(auth_user.get_user), db:Session = Depends(get_db)):
+    res = await act.find_birthday(birthday,user,db)
+    return res
 
-# @router.post("/find/lastname", response_model= List[ContactModel])
-# async def search_lastname(lastname:ContactLastname, db: Session = Depends(get_db)):
-#     res = await con.find_lastname(lastname, db)
-#     return res
-
+@router.post("/find_lastname", response_model=ContactModel)
+async def search_lastname(lastname:ContactLastname,user:User=Depends(auth_user.get_user) , db: Session = Depends(get_db)):
+    res = await act.find_lastname(lastname,user,db)
+    return res
