@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks, Request
 from src.actions.email import send_email
 
+
 router = APIRouter(prefix="/contacts")
 security = HTTPBearer()
 

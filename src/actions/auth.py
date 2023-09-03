@@ -5,15 +5,21 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-
+import redis
+import pickle
+from dotenv import load_dotenv
+import os
 from src.database.db import get_db
 from src.actions import users as action
+from src.conf.config import settings
+
 
 class Auth:
     context = CryptContext(schemes=["bcrypt"],deprecated = "auto")
-    SECRET = "Consequences"
-    AlGM = "HS256"
+    SECRET = settings.secret
+    AlGM = settings.algm
     oauth2 = OAuth2PasswordBearer(tokenUrl="/login")
+    # r = redis.Redis(host="redis-141948-0.cloudclusters.net",port=11515,db=0,username="dima190179@gmail.com", password="VOxzVADCaKY-KSGLE5JFUFBQUFBQUFBQUFBQjFYQTB")
 
     def verify_password(self, ordinary_password, hashed_password):
         return self.context.verify(ordinary_password, hashed_password)
@@ -58,11 +64,22 @@ class Auth:
             email = data["sub"]
             if email is None:
                 raise excpt
-            else:
-                user = await action.get_user(email, db)
-                if user is None:
-                    raise excpt
-                return user
+
+        # user = self.r.get(f"user:{email}")
+        # if user is None:
+        #     user = await action.get_user(email, db)
+        #     if user is None:
+        #         raise excpt
+        #     self.r.set(f"user:{email}", pickle.dumps(user))
+        #     self.r.expire(f"user:{email}",900)
+        # else:
+        #     user = pickle.loads(user)
+
+        user = await action.get_user(email, db)
+        if user is None:
+            raise excpt
+
+        return user
             
 
     async def create_email_token(self, data:dict):
